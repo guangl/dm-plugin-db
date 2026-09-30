@@ -1,6 +1,6 @@
 //! How "dm db list" reports saved connections: a table for people, JSON for scripts.
 
-use crate::types::DatabaseConnection;
+use crate::domain::types::DatabaseConnection;
 use anyhow::Result;
 use comfy_table::presets::UTF8_FULL;
 use comfy_table::{ContentArrangement, Table};

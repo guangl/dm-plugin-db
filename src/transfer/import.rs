@@ -1,14 +1,13 @@
 //! Importing connection settings from a JSON export document.
 
-use crate::connections::{open_database, validate_name};
-use crate::crypto::{encrypt, unhex};
-use crate::export::{EXPORT_KDF_ROUNDS, EXPORT_VERSION, ExportDocument};
-use crate::prompts::{Prompter, prompt_secret};
-use crate::types::DatabaseConnection;
-use aes_gcm::aead::{Aead, KeyInit};
-use aes_gcm::{Aes256Gcm, Key, Nonce};
+use crate::domain::types::DatabaseConnection;
+use crate::storage::connections::{open_database, validate_name};
+use crate::storage::crypto::{encrypt, unhex};
+use crate::transfer::export::{EXPORT_KDF_ROUNDS, EXPORT_VERSION, ExportDocument};
+use crate::ui::prompts::{Prompter, prompt_secret};
 use anyhow::{Context, Result, ensure};
 use dm_plugin_sdk::Context as PluginContext;
+use dm_plugin_support::secrets;
 use pbkdf2::pbkdf2_hmac;
 use rusqlite::params;
 use sha2::Sha256;
@@ -48,13 +47,9 @@ pub fn import_document(
             ensure!(payload.len() >= 12, "Invalid encrypted export length");
             let mut key = [0_u8; 32];
             pbkdf2_hmac::<Sha256>(passphrase.as_bytes(), &salt, EXPORT_KDF_ROUNDS, &mut key);
-            let cipher = Aes256Gcm::new(Key::<Aes256Gcm>::from_slice(&key));
-            let (nonce, ciphertext) = payload.split_at(12);
-            let plaintext = cipher
-                .decrypt(Nonce::from_slice(nonce), ciphertext)
-                .map_err(|_| {
-                    anyhow::anyhow!("Import passphrase is incorrect or export is damaged")
-                })?;
+            let plaintext = secrets::open(&key, &payload).map_err(|_| {
+                anyhow::anyhow!("Import passphrase is incorrect or export is damaged")
+            })?;
             serde_json::from_slice(&plaintext).context("Parse decrypted database connections")?
         }
         _ => anyhow::bail!(

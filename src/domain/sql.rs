@@ -1,6 +1,6 @@
 //! Reading the SQL of "dm db exec" and rendering what a statement returned.
 
-use crate::types::QueryResult;
+use crate::domain::types::QueryResult;
 use anyhow::{Context, Result, ensure};
 use std::{fs, io::Read, path::PathBuf};
 

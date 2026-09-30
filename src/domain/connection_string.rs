@@ -1,7 +1,7 @@
 //! The ODBC connection string used by "dm db test" and "dm db exec".
 
-use crate::config::DbConfig;
-use crate::types::{ConnectionSpec, DEFAULT_LOGIN_TIMEOUT, DatabaseConnection};
+use crate::domain::types::{ConnectionSpec, DEFAULT_LOGIN_TIMEOUT, DatabaseConnection};
+use crate::storage::config::DbConfig;
 use anyhow::{Result, ensure};
 use std::time::Duration;
 
@@ -25,7 +25,7 @@ fn reject_separators(label: &str, value: &str) -> Result<()> {
 /// Build the connection string used by "dm db test" and "dm db exec".
 ///
 /// The keywords follow the ODBC connection-string syntax the Dameng ODBC driver
-/// expects; the driver itself is still deferred, see src/driver.rs.
+/// expects; the driver itself is still deferred, see src/domain/driver.rs.
 pub fn build_connection_string(connection: &DatabaseConnection, password: &str) -> Result<String> {
     let host = connection.host.trim();
     let username = connection.username.trim();

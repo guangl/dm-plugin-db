@@ -1,12 +1,11 @@
 //! Plain and passphrase-encrypted connection export documents.
 
-use crate::crypto::{decrypt, hex};
-use crate::prompts::{Prompter, prompt_export_passphrase};
-use crate::types::DatabaseConnection;
-use aes_gcm::aead::{Aead, KeyInit};
-use aes_gcm::{Aes256Gcm, Key, Nonce};
+use crate::domain::types::DatabaseConnection;
+use crate::storage::crypto::{decrypt, hex};
+use crate::ui::prompts::{Prompter, prompt_export_passphrase};
 use anyhow::{Context, Result, ensure};
 use dm_plugin_sdk::Context as PluginContext;
+use dm_plugin_support::secrets;
 use pbkdf2::pbkdf2_hmac;
 use rand::{RngCore, rngs::OsRng};
 use sha2::Sha256;
@@ -110,15 +109,9 @@ pub fn export_document(
     OsRng.fill_bytes(&mut salt);
     let mut key = [0_u8; 32];
     pbkdf2_hmac::<Sha256>(passphrase.as_bytes(), &salt, EXPORT_KDF_ROUNDS, &mut key);
-    let cipher = Aes256Gcm::new(Key::<Aes256Gcm>::from_slice(&key));
-    let mut nonce = [0_u8; 12];
-    OsRng.fill_bytes(&mut nonce);
     let plaintext = serde_json::to_vec(&portable)?;
-    let encrypted = cipher
-        .encrypt(Nonce::from_slice(&nonce), plaintext.as_ref())
-        .map_err(|_| anyhow::anyhow!("Encrypt the export"))?;
-    let mut payload = nonce.to_vec();
-    payload.extend(encrypted);
+    let payload =
+        secrets::seal(&key, &plaintext).map_err(|_| anyhow::anyhow!("Encrypt the export"))?;
     Ok(ExportDocument {
         version: EXPORT_VERSION,
         count,

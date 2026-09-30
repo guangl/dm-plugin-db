@@ -7,7 +7,7 @@ use std::path::PathBuf;
 #[command(
     name = "dm db",
     about = "Manage saved Dameng database connections",
-    after_help = "This plugin reads its own configuration file (<config dir>/config.toml, see dm info db):\n  [defaults] port, username, driver, schema\n  [connect] timeout, probe"
+    after_help = "Getting started:\n  dm db add prod         Save a connection interactively\n  dm db list             Show saved connections\n  dm db export --file connections.json\n\nThis plugin reads its own configuration file (<config dir>/config.toml, see dm info db):\n  [defaults] port, username, driver, schema\n  [connect] timeout, probe"
 )]
 pub(crate) struct Cli {
     #[command(subcommand)]

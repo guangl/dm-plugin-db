@@ -1,8 +1,8 @@
 //! The connections.sqlite3 store behind add, list, remove and the commands
 //! that talk to a saved connection.
 
-use crate::crypto::decrypt;
-use crate::types::DatabaseConnection;
+use crate::domain::types::DatabaseConnection;
+use crate::storage::crypto::decrypt;
 use anyhow::{Context, Result, ensure};
 use dm_plugin_sdk::Context as PluginContext;
 use rusqlite::{Connection as Sqlite, params};

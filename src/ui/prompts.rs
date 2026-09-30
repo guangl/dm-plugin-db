@@ -1,6 +1,6 @@
 //! Interactive prompts and the resolvers behind "dm db add".
 
-use crate::types::DEFAULT_PORT;
+use crate::domain::types::DEFAULT_PORT;
 use anyhow::{Context, Result, ensure};
 use std::io::IsTerminal;
 

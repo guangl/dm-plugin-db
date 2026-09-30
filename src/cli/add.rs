@@ -1,13 +1,13 @@
 //! The "dm db add" command.
 
-use crate::config::load_config;
-use crate::connections::{upsert_connection, validate_name};
-use crate::crypto::encrypt;
-use crate::prompts::{
+use crate::domain::types::{DEFAULT_DRIVER, DEFAULT_USERNAME, DatabaseConnection};
+use crate::storage::config::load_config;
+use crate::storage::connections::{upsert_connection, validate_name};
+use crate::storage::crypto::encrypt;
+use crate::ui::prompts::{
     Prompter, resolve_optional, resolve_password, resolve_port, resolve_required,
     resolve_with_default,
 };
-use crate::types::{DEFAULT_DRIVER, DEFAULT_USERNAME, DatabaseConnection};
 use anyhow::{Result, ensure};
 use dm_plugin_sdk::Context as PluginContext;
 

@@ -1,9 +1,8 @@
 //! Machine-key encryption of stored passwords and the hexadecimal codec.
 
-use aes_gcm::aead::{Aead, KeyInit};
-use aes_gcm::{Aes256Gcm, Key, Nonce};
 use anyhow::{Context, Result, ensure};
 use dm_plugin_sdk::Context as PluginContext;
+use dm_plugin_support::secrets;
 use rand::{RngCore, rngs::OsRng};
 use std::{fs, path::PathBuf};
 
@@ -39,37 +38,16 @@ pub fn machine_key(context: &PluginContext) -> Result<[u8; 32]> {
 
 pub fn encrypt(context: &PluginContext, plaintext: &[u8]) -> Result<String> {
     let key = machine_key(context)?;
-    let cipher = Aes256Gcm::new(Key::<Aes256Gcm>::from_slice(&key));
-    let mut nonce = [0_u8; 12];
-    OsRng.fill_bytes(&mut nonce);
-    let ciphertext = cipher
-        .encrypt(Nonce::from_slice(&nonce), plaintext)
+    let bytes = secrets::seal(&key, plaintext)
         .map_err(|_| anyhow::anyhow!("Encrypt the database password"))?;
-    Ok(format!("{}{}", hex(&nonce), hex(&ciphertext)))
+    Ok(hex(&bytes))
 }
 
 pub fn decrypt(context: &PluginContext, text: &str) -> Result<Vec<u8>> {
     let bytes = unhex(text)?;
     ensure!(bytes.len() >= 12, "Invalid encrypted password length");
-    let (nonce, ciphertext) = bytes.split_at(12);
     let key = machine_key(context)?;
-    let cipher = Aes256Gcm::new(Key::<Aes256Gcm>::from_slice(&key));
-    cipher
-        .decrypt(Nonce::from_slice(nonce), ciphertext)
-        .map_err(|_| anyhow::anyhow!("Decrypt the database password"))
+    secrets::open(&key, &bytes).map_err(|_| anyhow::anyhow!("Decrypt the database password"))
 }
 
-pub fn hex(bytes: &[u8]) -> String {
-    bytes.iter().map(|byte| format!("{byte:02x}")).collect()
-}
-
-pub fn unhex(text: &str) -> Result<Vec<u8>> {
-    ensure!(
-        text.len() % 2 == 0 && text.bytes().all(|byte| byte.is_ascii_hexdigit()),
-        "Expected hexadecimal text"
-    );
-    (0..text.len())
-        .step_by(2)
-        .map(|index| u8::from_str_radix(&text[index..index + 2], 16).map_err(Into::into))
-        .collect()
-}
+pub use dm_plugin_support::codec::{hex, unhex};
