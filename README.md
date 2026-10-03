@@ -60,6 +60,10 @@
 - `dm db doctor [--json]`：检查配置与连接存储，发现问题返回非零。
 - 动态补全包含插件子命令、参数、文件路径和保存的连接名称；按宿主的 `dm completions <shell>` 安装即可，不需另装插件补全脚本。
 
-完整安装方式见 [补全说明](../../docs/usability.md)。
+完整安装方式见 [补全说明](https://guangl.github.io/dameng-cli/usability.html)。
 
 `--clear-schema` 显式清除 schema。数据库驱动仍是占位实现，`doctor` 会报告 `test/exec` 暂不可用。
+
+## 独立开发与发布
+
+此仓库可独立克隆、构建和测试，版本独立于宿主。发布流程与凭证配置见 [CONTRIBUTING.md](CONTRIBUTING.md)。宿主以 git submodule 固定使用的提交。
