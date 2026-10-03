@@ -3,8 +3,8 @@
 use crate::domain::types::DEFAULT_PORT;
 use anyhow::{Context, Result, ensure};
 
-pub(crate) use dm_plugin_support::interaction::terminal_prompter;
-pub use dm_plugin_support::interaction::{Prompter, TerminalPrompter, resolve_required};
+pub(crate) use crate::support::interaction::terminal_prompter;
+pub use crate::support::interaction::{Prompter, TerminalPrompter, resolve_required};
 
 /// Resolve a value that falls back to the plugin configuration and then to a
 /// documented default; an empty interactive answer keeps that default.
@@ -56,7 +56,7 @@ pub fn resolve_port(
     configured: Option<u16>,
     prompter: Option<&dyn Prompter>,
 ) -> Result<u16> {
-    dm_plugin_support::interaction::port(port.or(configured), DEFAULT_PORT, prompter)
+    crate::support::interaction::port(port.or(configured), DEFAULT_PORT, prompter)
 }
 
 /// Resolve the password for "dm db add", prompting on the terminal when one was
@@ -65,7 +65,7 @@ pub fn resolve_password(
     password: Option<String>,
     prompter: Option<&dyn Prompter>,
 ) -> Result<String> {
-    dm_plugin_support::interaction::password(
+    crate::support::interaction::password(
         password,
         prompter,
         "Database password is required; pass --password or run from a terminal",

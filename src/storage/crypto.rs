@@ -1,8 +1,8 @@
 //! Machine-key encryption of stored passwords and the hexadecimal codec.
 
+use crate::support::secrets;
 use anyhow::{Context, Result, ensure};
 use dm_plugin_sdk::Context as PluginContext;
-use dm_plugin_support::secrets;
 use rand::{TryRng, rngs::SysRng};
 use std::{fs, path::PathBuf};
 
@@ -15,7 +15,7 @@ pub fn machine_key(context: &PluginContext) -> Result<[u8; 32]> {
     fs::create_dir_all(&context.data_dir).context("Create the database plugin data directory")?;
     let path = key_path(context);
     if path.is_file() {
-        let bytes = dm_plugin_support::bounded::file(&path, 32)
+        let bytes = crate::support::bounded::file(&path, 32)
             .context("Read the connection encryption key")?;
         ensure!(
             bytes.len() == 32,
@@ -53,4 +53,4 @@ pub fn decrypt(context: &PluginContext, text: &str) -> Result<Vec<u8>> {
     secrets::open(&key, &bytes).map_err(|_| anyhow::anyhow!("Decrypt the database password"))
 }
 
-pub use dm_plugin_support::codec::{hex, unhex};
+pub use crate::support::codec::{hex, unhex};

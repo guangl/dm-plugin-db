@@ -1,8 +1,8 @@
 //! Reading the SQL of "dm db exec" and rendering what a statement returned.
 
 use crate::domain::types::QueryResult;
+use crate::support::bounded::{self, DOCUMENT_LIMIT};
 use anyhow::{Context, Result, ensure};
-use dm_plugin_support::bounded::{self, DOCUMENT_LIMIT};
 use std::path::PathBuf;
 
 /// Read the SQL of "dm db exec" from the argument, a file, or stdin.

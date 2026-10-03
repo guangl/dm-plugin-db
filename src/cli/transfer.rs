@@ -42,7 +42,7 @@ pub(super) fn import(
     prompter: Option<&dyn Prompter>,
 ) -> Result<()> {
     let document: ExportDocument = serde_json::from_slice(
-        &dm_plugin_support::bounded::file(&file, dm_plugin_support::bounded::DOCUMENT_LIMIT)
+        &crate::support::bounded::file(&file, crate::support::bounded::DOCUMENT_LIMIT)
             .with_context(|| format!("Read {}", file.display()))?,
     )
     .with_context(|| format!("Parse database connection export {}", file.display()))?;

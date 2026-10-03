@@ -1,6 +1,6 @@
 use super::fields::Fields;
+use crate::support::config::ConfigCommand;
 use clap::{Parser, Subcommand};
-use dm_plugin_support::config::ConfigCommand;
 use std::path::PathBuf;
 
 #[derive(Parser)]

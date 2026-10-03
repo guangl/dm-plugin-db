@@ -309,7 +309,6 @@ dependencies = [
  "clap",
  "comfy-table",
  "dm-plugin-sdk",
- "dm-plugin-support",
  "pbkdf2",
  "rand",
  "rpassword",
@@ -325,21 +324,6 @@ dependencies = [
 name = "dm-plugin-sdk"
 version = "0.4.1"
 source = "git+https://github.com/guangl/dm-plugin-sdk.git?rev=b12ce0d937e2f732151b30a1850e08ed4e5c9cf9#b12ce0d937e2f732151b30a1850e08ed4e5c9cf9"
-
-[[package]]
-name = "dm-plugin-support"
-version = "0.1.0"
-source = "git+https://github.com/guangl/dm-plugin-support.git?rev=9304a71f65bd4819a50a47aed40016e339e0ead7#9304a71f65bd4819a50a47aed40016e339e0ead7"
-dependencies = [
- "aes-gcm",
- "anyhow",
- "clap",
- "rand",
- "rpassword",
- "serde",
- "serde_json",
- "tempfile",
-]
 
 [[package]]
 name = "document-features"

@@ -52,14 +52,13 @@ pub fn config_path(context: &PluginContext) -> PathBuf {
 /// Load the plugin configuration. A missing file means "all defaults".
 pub fn load_config(context: &PluginContext) -> Result<DbConfig> {
     let path = config_path(context);
-    let text =
-        match dm_plugin_support::bounded::text(&path, dm_plugin_support::bounded::CONFIG_LIMIT) {
-            Ok(text) => text,
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
-                return Ok(DbConfig::default());
-            }
-            Err(error) => return Err(error).with_context(|| format!("Read {}", path.display())),
-        };
+    let text = match crate::support::bounded::text(&path, crate::support::bounded::CONFIG_LIMIT) {
+        Ok(text) => text,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            return Ok(DbConfig::default());
+        }
+        Err(error) => return Err(error).with_context(|| format!("Read {}", path.display())),
+    };
     let config: DbConfig = toml::from_str(&text).with_context(|| {
         format!(
             "Invalid database plugin configuration {}; supported tables are [defaults] and [connect]",

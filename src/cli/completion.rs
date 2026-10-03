@@ -27,7 +27,7 @@ pub(super) fn handle(context: &Context) -> Result<bool> {
         .skip(1)
         .map(|arg| arg.to_string_lossy().into_owned())
         .collect();
-    for value in dm_plugin_support::completion::candidates(Cli::command(), &words, &names) {
+    for value in crate::support::completion::candidates(Cli::command(), &words, &names) {
         println!("{value}");
     }
     Ok(true)
