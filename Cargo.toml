@@ -18,7 +18,7 @@ name = "dm-db"
 path = "src/main.rs"
 
 [dependencies]
-dm-plugin-support = { version = "0.1.0", git = "https://github.com/guangl/dameng-cli.git", rev = "b2f0955842d1caf0b380626f4f10ebff81a0c9bb" }
+dm-plugin-support = { version = "0.1.0", git = "https://github.com/guangl/dm-plugin-support.git", rev = "9304a71f65bd4819a50a47aed40016e339e0ead7" }
 aes-gcm = "0.11"
 anyhow = "1.0"
 clap = { version = "4.6", features = ["derive"] }
