@@ -31,11 +31,16 @@ def package():
     labels = {
         "x86_64-unknown-linux-gnu": "x86_64-linux",
         "aarch64-unknown-linux-gnu": "aarch64-linux",
+        "armv7-unknown-linux-gnueabihf": "armv7-linux",
         "aarch64-apple-darwin": "aarch64-macos",
         "x86_64-apple-darwin": "x86_64-macos",
         "x86_64-pc-windows-msvc": "x86_64-windows",
+        "aarch64-pc-windows-msvc": "aarch64-windows",
     }
-    if target not in {*labels, "x86_64-unknown-linux-musl"}:
+    # musl builds reuse the label of the GNU build for the same architecture:
+    # they are interchangeable for users and only one asset can carry the name.
+    musl_only = {"x86_64-unknown-linux-musl", "aarch64-unknown-linux-musl"}
+    if target not in {*labels, *musl_only}:
         raise SystemExit(f"Unsupported release target: {target}")
     windows = target.endswith("windows-msvc")
     binary = "dm-" + manifest["name"] + (".exe" if windows else "")
