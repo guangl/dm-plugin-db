@@ -1,0 +1,115 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to build and publish
+        required: true
+        type: string
+
+env:
+  PYTHONUTF8: "1"
+  RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
+  build:
+    needs: checks
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+          - os: macos-latest
+            target: aarch64-apple-darwin
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Install GNU Linux linker
+        if: endsWith(matrix.target, '-linux-gnu')
+        run: python -m pip install cargo-zigbuild==0.23.4 ziglang==0.15.2
+      - name: Install musl toolchain
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+      - name: Configure musl linker
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        run: |
+          echo "CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=musl-gcc" >> "$GITHUB_ENV"
+          echo "CC_x86_64_unknown_linux_musl=musl-gcc" >> "$GITHUB_ENV"
+      - name: Verify version
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: python scripts/release.py verify
+      - name: Build plugin
+        shell: bash
+        run: bash scripts/build_release.sh "${{ matrix.target }}"
+      - name: Check GNU Linux glibc requirements and runtime
+        if: endsWith(matrix.target, '-linux-gnu')
+        run: |
+          python scripts/check_glibc.py "${{ matrix.target }}"
+          bash scripts/test_glibc_runtime.sh "${{ matrix.target }}"
+      - name: Package binary, license and checksums
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+          RELEASE_TARGET: ${{ matrix.target }}
+        run: python scripts/release.py package
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dm-db-${{ matrix.target }}
+          path: dist/*
+          if-no-files-found: error
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        shell: bash
+        run: |
+          flags=()
+          if [[ "$RELEASE_TAG" == *-* ]]; then flags+=(--prerelease); fi
+          notes="docs/releases/$RELEASE_TAG.md"
+          if [[ -f "$notes" ]]; then
+            flags+=(--notes-file "$notes")
+          else
+            flags+=(--generate-notes)
+          fi
+          gh release create "$RELEASE_TAG" dist/* --verify-tag "${flags[@]}"
