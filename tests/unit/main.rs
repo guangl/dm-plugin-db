@@ -15,6 +15,11 @@ mod plugin;
 mod prompts;
 mod sql;
 mod store;
+mod support_completion;
+mod support_config;
+mod support_interaction;
+mod support_resources;
+mod support_secrets;
 mod test_command;
 
 mod usability;

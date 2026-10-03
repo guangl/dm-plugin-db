@@ -2,10 +2,10 @@
 
 use crate::domain::types::DatabaseConnection;
 use crate::storage::crypto::{decrypt, hex};
+use crate::support::secrets;
 use crate::ui::prompts::{Prompter, prompt_export_passphrase};
 use anyhow::{Context, Result, ensure};
 use dm_plugin_sdk::Context as PluginContext;
-use dm_plugin_support::secrets;
 use pbkdf2::pbkdf2_hmac;
 use rand::{TryRng, rngs::SysRng};
 use sha2::Sha256;

@@ -36,7 +36,7 @@ pub(crate) fn add_connection(
             validate_name(&name)?;
             name
         }
-        None => dm_plugin_support::interaction::validated(
+        None => crate::support::interaction::validated(
             prompter.ok_or_else(|| anyhow::anyhow!("连接名称必填"))?,
             "连接名称: ",
             |name| {
@@ -81,7 +81,7 @@ pub(crate) fn add_connection(
     )?;
     let password = resolve_password(request.password.clone(), prompter)?;
     if prompter.is_some() {
-        dm_plugin_support::interaction::confirm(
+        crate::support::interaction::confirm(
             prompter,
             yes,
             &format!("保存连接 {name}：{username}@{host}:{port}（密码已隐藏）？"),

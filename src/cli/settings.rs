@@ -1,10 +1,10 @@
-use crate::{config_path, load_config, load_connections};
-use anyhow::Result;
-use dm_plugin_sdk::Context;
-use dm_plugin_support::{
+use crate::support::{
     config::{ConfigCommand, initialize, setting, show},
     diagnostics::DiagnosticReport,
 };
+use crate::{config_path, load_config, load_connections};
+use anyhow::Result;
+use dm_plugin_sdk::Context;
 
 pub(super) fn config(context: &Context, command: ConfigCommand) -> Result<()> {
     let path = config_path(context);

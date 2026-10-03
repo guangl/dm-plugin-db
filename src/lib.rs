@@ -17,7 +17,11 @@ mod domain;
 mod storage;
 mod transfer;
 mod ui;
-use dm_plugin_support::private_file;
+
+#[doc(hidden)]
+pub mod support;
+
+use crate::support::private_file;
 
 use dm_plugin_sdk::{Context as PluginContext, Plugin, PluginResult};
 

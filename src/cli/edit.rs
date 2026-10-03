@@ -1,8 +1,8 @@
 use super::fields::Fields;
+use crate::support::interaction::{confirm, edit_field, port};
 use crate::{DatabaseConnection, Prompter, encrypt, find_connection, upsert_connection};
 use anyhow::Result;
 use dm_plugin_sdk::Context;
-use dm_plugin_support::interaction::{confirm, edit_field, port};
 
 pub(super) fn edit(
     context: &Context,

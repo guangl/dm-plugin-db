@@ -85,7 +85,7 @@ pub fn run_with_prompter(
         }
         DbCommand::Remove { name, yes } => {
             crate::find_connection(context, &name)?;
-            dm_plugin_support::interaction::confirm(prompter, yes, &format!("删除连接 {name}？"))?;
+            crate::support::interaction::confirm(prompter, yes, &format!("删除连接 {name}？"))?;
             remove_connection(context, &name)?;
             println!("已删除数据库连接 {name}");
         }
@@ -95,7 +95,7 @@ pub fn run_with_prompter(
         } => transfer::export(context, file, include_passwords, prompter)?,
         DbCommand::Import { file, replace } => transfer::import(context, file, replace, prompter)?,
         DbCommand::Test { name } => {
-            let name = dm_plugin_support::interaction::select_name(
+            let name = crate::support::interaction::select_name(
                 name,
                 &load_connections(context)?
                     .into_iter()
