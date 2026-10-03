@@ -23,8 +23,8 @@
 
 ## 配置
 
-插件由自己的目录配置：`<DM_PLUGIN_HOME>/config/db/config.toml`（默认
-`~/.config/dm/config/db/config.toml`，可用 `dm info db` 查看）。完整示例见
+插件由自己的目录配置：宿主通过 `DM_PLUGIN_CONFIG_DIR` 指定目录，约定文件是该目录下的
+`config.toml`（用 `dm info db` 查看实际路径与文件是否存在）。完整示例见
 [config.example.toml](config.example.toml)，包含 `[defaults]`（port/username/driver/schema）
 与 `[connect]`（timeout/probe）。优先级为命令行参数 > 配置文件 > 内置默认值；未知表、未知键或非法值会让命令直接失败并指出该文件。
 
