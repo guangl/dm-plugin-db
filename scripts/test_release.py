@@ -16,8 +16,10 @@ ROOT = Path(__file__).resolve().parent.parent
 class ReleaseTests(unittest.TestCase):
     def test_all_targets_and_checksums(self):
         for target in ("x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu",
-                       "x86_64-unknown-linux-musl", "aarch64-apple-darwin",
-                       "x86_64-apple-darwin", "x86_64-pc-windows-msvc"):
+                       "x86_64-unknown-linux-musl", "aarch64-unknown-linux-musl",
+                       "armv7-unknown-linux-gnueabihf", "aarch64-apple-darwin",
+                       "x86_64-apple-darwin", "x86_64-pc-windows-msvc",
+                       "aarch64-pc-windows-msvc"):
             with self.subTest(target=target), tempfile.TemporaryDirectory() as directory:
                 previous = Path.cwd()
                 try:
